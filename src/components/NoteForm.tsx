@@ -1,36 +1,36 @@
-import { FormEvent, useRef } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import CreatableReactSelect from 'react-select/creatable';
 
 import { Button, Col, Form, Row, Stack } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../hooks/useAppDispatch';
 import { createTag } from '../store/reducers/tagsSlice';
 import useAppSelector from '../hooks/useAppSelector';
 import { createNote } from '../store/reducers/notesSlice';
-import { SelectInstance } from 'react-select';
 import { Tag } from '../types/types';
+import { nanoid } from '@reduxjs/toolkit';
 
 function NoteForm() {
-	const dispatch = useAppDispatch();
-
-	const tags = useAppSelector(state => state.tags);
-
 	const titleRef = useRef<HTMLInputElement>(null);
 	const markdownRef = useRef<HTMLTextAreaElement>(null);
-	const selectRef = useRef<SelectInstance>(null);
+	const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+
+	const dispatch = useAppDispatch();
+	const tags = useAppSelector(state => state.tags);
+
+	const navigate = useNavigate();
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
-		// const tags = selectRef.current
-		// 	?.getValue()
-		// 	.map(tag => ({ id: tag.value, label: tag.label } as unknown) as Tag[]);
-		// const note = {
-		// 	title: titleRef.current!.value,
-		// 	markdown: markdownRef.current!.value,
-		// 	tags
-		// };
-		// dispatch(createNote(note));
+		const note = {
+			title: titleRef.current!.value,
+			markdown: markdownRef.current!.value,
+			tags: selectedTags
+		};
+		dispatch(createNote(note));
+
+		navigate('..');
 	};
 
 	return (
@@ -55,12 +55,20 @@ function NoteForm() {
 								// 	return { label: selectedTag.label, value: selectedTag.id };
 								// })}
 								onCreateOption={label => {
-									dispatch(createTag(label));
+									const tag = { id: nanoid(), label };
+									setSelectedTags(prev => [...prev, tag]);
+									dispatch(createTag(tag));
 								}}
 								options={tags.map(tag => {
 									return { label: tag.label, value: tag.id };
 								})}
-								ref={selectRef}
+								onChange={tags => {
+									setSelectedTags(
+										tags.map(tag => {
+											return { label: tag.label, id: tag.value };
+										})
+									);
+								}}
 								isMulti
 							/>
 						</Form.Group>

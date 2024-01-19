@@ -25,10 +25,10 @@ const notesSlice = createSlice({
 		// },
 
 		removeNote(state, action: PayloadAction<UniqueId>) {
-			state = state.filter(note => note.id !== action.payload);
+			return state.filter(note => note.id !== action.payload);
 		},
 		updateNote(state, action: PayloadAction<Note>) {
-			state = state.map(note => {
+			return state.map(note => {
 				if (note.id === action.payload.id) {
 					return { ...note, ...action.payload };
 				} else {

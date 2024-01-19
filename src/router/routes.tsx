@@ -3,11 +3,12 @@ import { Navigate } from 'react-router-dom';
 // import RootLayout from '../layouts/RootLayout';
 
 import NewNotePage from '../pages/NewNotePage';
+import NotesPage from '../pages/NotesPage';
 
 const routes = [
 	{
 		path: '/',
-		element: <NewNotePage />
+		element: <NotesPage />
 	},
 	{
 		path: '/new',
