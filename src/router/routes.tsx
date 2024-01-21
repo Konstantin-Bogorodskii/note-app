@@ -1,9 +1,12 @@
 import { Navigate } from 'react-router-dom';
 
-// import RootLayout from '../layouts/RootLayout';
+import NoteLayout from '../layouts/NoteLayout';
 
 import NewNotePage from '../pages/NewNotePage';
 import NotesPage from '../pages/NotesPage';
+
+import Note from '../components/Note';
+import NoteEdit from '../components/NoteEdit';
 
 const routes = [
 	{
@@ -15,15 +18,16 @@ const routes = [
 		element: <NewNotePage />
 	},
 	{
-		path: '/id',
+		path: '/:id',
+		element: <NoteLayout />,
 		children: [
 			{
 				index: true,
-				element: <h1>id</h1>
+				element: <Note />
 			},
 			{
 				path: 'edit',
-				element: <h1>edit</h1>
+				element: <NoteEdit />
 			}
 		]
 	},

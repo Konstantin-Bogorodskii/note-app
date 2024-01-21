@@ -6,29 +6,41 @@ import { Link, useNavigate } from 'react-router-dom';
 import useAppDispatch from '../hooks/useAppDispatch';
 import { createTag } from '../store/reducers/tagsSlice';
 import useAppSelector from '../hooks/useAppSelector';
-import { createNote } from '../store/reducers/notesSlice';
-import { Tag } from '../types/types';
+import { createNote, updateNote } from '../store/reducers/notesSlice';
+import { PartialNote, Tag } from '../types/types';
 import { nanoid } from '@reduxjs/toolkit';
 
-function NoteForm() {
+interface NoteFormProps {
+	note?: PartialNote;
+}
+
+function NoteForm({ note }: NoteFormProps) {
 	const titleRef = useRef<HTMLInputElement>(null);
 	const markdownRef = useRef<HTMLTextAreaElement>(null);
-	const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+	const [selectedTags, setSelectedTags] = useState<Tag[]>(note?.tags || []);
 
 	const dispatch = useAppDispatch();
-	const tags = useAppSelector(state => state.tags);
+	const createdTags = useAppSelector(state => state.tags);
 
 	const navigate = useNavigate();
+
+	const title = note?.title || '';
+	const markdown = note?.markdown || '';
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
-		const note = {
+		const noteData = {
 			title: titleRef.current!.value,
 			markdown: markdownRef.current!.value,
 			tags: selectedTags
 		};
-		dispatch(createNote(note));
+
+		if (note) {
+			dispatch(updateNote({ id: note.id, ...noteData }));
+		} else {
+			dispatch(createNote(noteData));
+		}
 
 		navigate('..');
 	};
@@ -40,26 +52,22 @@ function NoteForm() {
 					<Col>
 						<Form.Group controlId="title">
 							<Form.Label>Title</Form.Label>
-							<Form.Control
-								ref={titleRef}
-								required
-								//   defaultValue={title}
-							/>
+							<Form.Control ref={titleRef} required defaultValue={title} />
 						</Form.Group>
 					</Col>
 					<Col>
 						<Form.Group controlId="tags">
 							<Form.Label>Tags</Form.Label>
 							<CreatableReactSelect
-								// value={selectedTags.map(selectedTag => {
-								// 	return { label: selectedTag.label, value: selectedTag.id };
-								// })}
+								value={selectedTags.map(tag => {
+									return { label: tag.label, value: tag.id };
+								})}
 								onCreateOption={label => {
 									const tag = { id: nanoid(), label };
 									setSelectedTags(prev => [...prev, tag]);
 									dispatch(createTag(tag));
 								}}
-								options={tags.map(tag => {
+								options={createdTags.map(tag => {
 									return { label: tag.label, value: tag.id };
 								})}
 								onChange={tags => {
@@ -77,7 +85,7 @@ function NoteForm() {
 				<Form.Group controlId="markdown">
 					<Form.Label>Body</Form.Label>
 					<Form.Control
-						// defaultValue={markdown}
+						defaultValue={markdown}
 						required
 						as="textarea"
 						ref={markdownRef}

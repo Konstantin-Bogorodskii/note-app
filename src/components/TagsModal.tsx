@@ -1,7 +1,8 @@
 import { Button, Col, Form, Modal, Row, Stack } from 'react-bootstrap';
 import useAppSelector from '../hooks/useAppSelector';
 import useAppDispatch from '../hooks/useAppDispatch';
-import { removeTag, updateTag } from '../store/reducers/tagsSlice';
+import { deleteTag, updateTag } from '../store/reducers/tagsSlice';
+import { filterNotesWithTags } from '../store/reducers/notesSlice';
 
 type TagsModalProps = {
 	isModalOpen: boolean;
@@ -36,7 +37,8 @@ function TagsModal({ handleClose, isModalOpen }: TagsModalProps) {
 								<Col xs="auto">
 									<Button
 										onClick={() => {
-											dispatch(removeTag(tag.id));
+											dispatch(deleteTag(tag.id));
+											dispatch(filterNotesWithTags(tag.id));
 										}}
 										variant="outline-danger">
 										&times;

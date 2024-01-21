@@ -13,18 +13,7 @@ const notesSlice = createSlice({
 				...action.payload
 			});
 		},
-		// createNote: {
-		// 	reducer: (state, action: PayloadAction<NoteData>) => {
-		// 		state.push(action.payload);
-		// 	},
-		// 	prepare: (note: NoteData) => {
-		// 		const id = nanoid();
-		// 		const tags = note.tags.map(tag => { id: tag.value, label: tag.label })
-		// 		return { payload: { id, ...note, tags } };
-		// 	}
-		// },
-
-		removeNote(state, action: PayloadAction<UniqueId>) {
+		deleteNote(state, action: PayloadAction<UniqueId>) {
 			return state.filter(note => note.id !== action.payload);
 		},
 		updateNote(state, action: PayloadAction<Note>) {
@@ -35,10 +24,17 @@ const notesSlice = createSlice({
 					return note;
 				}
 			});
+		},
+		filterNotesWithTags(state, action: PayloadAction<UniqueId>) {
+			return state.filter(note => {
+				return !note.tags.some(tag => {
+					return tag.id === action.payload;
+				});
+			});
 		}
 	}
 });
 
-export const { createNote, removeNote, updateNote } = notesSlice.actions;
+export const { createNote, deleteNote, updateNote, filterNotesWithTags } = notesSlice.actions;
 
 export default notesSlice.reducer;
